@@ -17,6 +17,12 @@ require (
 )
 
 require (
+	github.com/adrg/xdg v0.4.0 // indirect
+	github.com/mitchellh/go-homedir v1.1.0 // indirect
+)
+
+require (
+	dagger.io/dagger v0.11.2
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
