@@ -6,12 +6,11 @@ import (
 
 type PluginCi struct{}
 
-func (m *PluginCi) Hello() string {
-	return "Hello Moodle"
-}
+var php = []string{"7.4", "8.0", "8.1"}
+var moodle_version = []string{"MOODLE_401_STABLE"}
+var database = []string{"pgsql", "mariadb"}
 
-func (m *PluginCi) All(ctx context.Context) (string, error) {
-
+func (m *PluginCi) Init(ctx context.Context) *Container {
 	// Initialize sidecar services
 	mariadb := dag.Container().
 		From("mariadb:10").
@@ -24,23 +23,22 @@ func (m *PluginCi) All(ctx context.Context) (string, error) {
 		WithExposedPort(3306).
 		AsService()
 
+	postgres := dag.Container().
+		From("postgres:13").
+		WithEnvVariable("POSTGRES_USER", "postgres").
+		WithEnvVariable("POSTGRES_HOST_AUTH_METHOD", "trust").
+		WithExposedPort(5432).
+		AsService()
+
+	// Setup moodle
+
+	return dag.Container().
+		From("php:8.1-fpm-bullseye").
+		WithServiceBinding("mariadb", mariadb).
+		WithServiceBinding("pgsql", postgres).
+		WithExec([]string{"echo", "max_input_vars=5000", ">>", "/usr/local/etc/php/php.ini-production"})
 	// Begin running tests
 
-	// get Drupal base image
-	// install additional dependencies
-	drupal := dag.Container().
-		From("drupal:10.0.7-php8.2-fpm").
-		WithExec([]string{"composer", "require", "drupal/core-dev", "--dev", "--update-with-all-dependencies"})
-
-	// add service binding for MariaDB
-	// run kernel tests using PHPUnit
-	return drupal.
-		WithServiceBinding("db", mariadb).
-		WithEnvVariable("SIMPLETEST_DB", "mysql://root:password@db/drupal").
-		WithEnvVariable("SYMFONY_DEPRECATIONS_HELPER", "disabled").
-		WithWorkdir("/opt/drupal/web/core").
-		WithExec([]string{"../../vendor/bin/phpunit", "-v", "--group", "KernelTests"}).
-		Stdout(ctx)
 }
 
 // Returns a container that echoes whatever string argument is provided
