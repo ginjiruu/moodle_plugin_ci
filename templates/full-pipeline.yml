@@ -1,0 +1,8 @@
+# TODO
+spec:
+	inputs:
+		dagger_pluginci: 
+			description: 'Defines the url to the dagger plugin ci tool to use'
+			default: 'https://gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/-/archive/master/moodle-plugin-ci-master.tar.gz?path=pluginci'
+		php_versions:
+			- 

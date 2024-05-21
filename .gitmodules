@@ -1,6 +1,0 @@
-[submodule "plugin"]
-	path = plugin
-	url = git@vcs.premergencydev.com:Premergency/dms_ovh9_stable.git
-[submodule "dependencies/usersets"]
-	path = dependencies/usersets
-	url = git@vcs.premergencydev.com:local/usersets.git

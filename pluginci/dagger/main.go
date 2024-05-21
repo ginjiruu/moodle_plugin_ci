@@ -3,14 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
-	"slices"
+	"strings"
 )
 
 func New(
 	// Plugin to run CI on
 	plugin *Directory,
-	// Path to any dependencies required for the plugin
-	dependencies *Directory,
+	// Path to dependency file required for the plugin
+	// If not provided defaults to plugin_requirements.txt
+	// +optional
+	// +default="plugin_requirements.txt"
+	dependencyFile string,
 	// +optional
 	// +default="8.1"
 	phpVersion string,
@@ -23,7 +26,7 @@ func New(
 ) *PluginCi {
 	return &PluginCi{
 		Plugin:        plugin,
-		Dependencies:  dependencies,
+		Dependencies:  dependencyFile,
 		PhpVersion:    phpVersion,
 		MoodleVersion: moodleVersion,
 		Database:      database,
@@ -32,7 +35,7 @@ func New(
 
 type PluginCi struct {
 	Plugin        *Directory
-	Dependencies  *Directory
+	Dependencies  string
 	PhpVersion    string
 	MoodleVersion string
 	Database      string
@@ -89,6 +92,17 @@ func (m *PluginCi) PostgresService() *Service {
 		AsService()
 }
 
+// Downloads and provides all dependencies needed to install the plugin
+func (m *PluginCi) GetDependencies(ctx context.Context) *Directory {
+	var content, _ = m.Plugin.Directory("./").File(m.Dependencies).Contents(ctx)
+	var dependencies = dag.Directory()
+	for _, dependency := range strings.Split(content, "\n") {
+		dependencies.
+			WithDirectory("./", dag.Git(dependency).Head().Tree())
+	}
+	return dependencies
+}
+
 // Init function for setting up template that other jobs draw from
 func (m *PluginCi) Moodle(
 	ctx context.Context) *Container {
@@ -107,7 +121,7 @@ func (m *PluginCi) Moodle(
 		WithDirectory("/var/www/html", m.Plugin, ContainerWithDirectoryOpts{
 			Owner: "www-data:www-data",
 		}).
-		WithDirectory("/var/www/dependencies", m.Dependencies, ContainerWithDirectoryOpts{
+		WithDirectory("/var/www/dependencies", m.GetDependencies(ctx), ContainerWithDirectoryOpts{
 			Owner: "www-data:www-data",
 		}).
 		WithWorkdir("/var/www/html").
@@ -159,19 +173,20 @@ func (m *PluginCi) Test(
 	// +optional
 	// +default=["phplint"]
 	operations []string,
-) {
-	if slices.Contains(operations, "all") {
-		operations[0] = "phplint"
-		operations = append(operations, "phpmd")
-		operations = append(operations, "phpcs")
-		operations = append(operations, "phpdoc")
-		operations = append(operations, "validate")
-		operations = append(operations, "savepoints")
-		operations = append(operations, "mustache")
-		operations = append(operations, "grunt")
-		operations = append(operations, "phpunit")
-	}
-	for _, operation := range operations {
-		m.Moodle(ctx).WithExec([]string{"../ci/bin/moodle-plugin-ci", operation}).Stdout(ctx)
-	}
+) (string, error) {
+	// if slices.Contains(operations, "all") {
+	// 	operations[0] = "phplint"
+	// 	operations = append(operations, "phpmd")
+	// 	operations = append(operations, "phpcs")
+	// 	operations = append(operations, "phpdoc")
+	// 	operations = append(operations, "validate")
+	// 	operations = append(operations, "savepoints")
+	// 	operations = append(operations, "mustache")
+	// 	operations = append(operations, "grunt")
+	// 	operations = append(operations, "phpunit")
+	// }
+	// for _, operation := range operations {
+	return m.Moodle(ctx).WithExec([]string{"../ci/bin/moodle-plugin-ci", operations[0]}).Stdout(ctx)
+	// }
+	// return content, errs
 }

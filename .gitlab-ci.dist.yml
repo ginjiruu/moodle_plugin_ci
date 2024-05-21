@@ -1,7 +1,0 @@
-include:
-  - component: gitlab.com/components/opentofu/validate-plan-apply@<VERSION>
-    inputs:
-      version: <VERSION>
-      opentofu_version: <OPENTOFU_VERSION>
-      root_dir: terraform/
-      state_name: production
