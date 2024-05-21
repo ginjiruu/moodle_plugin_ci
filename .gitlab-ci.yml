@@ -34,7 +34,7 @@ stages:
         - "7.4"
         - "8.0"
         - "8.1"
-      - DATABASE:
+        DATABASE:
         - pgsql
         - mariadb
 
