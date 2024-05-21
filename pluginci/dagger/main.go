@@ -96,6 +96,7 @@ func (m *PluginCi) Moodle(
 		From(fmt.Sprintf("php:%s-apache-bullseye", m.PhpVersion)).
 		//WithServiceBinding("pgsql", postgres).
 		WithExec([]string{"echo", "max_input_vars=5000", ">>", "/usr/local/etc/php/php.ini-production"}).
+		WithExec([]string{"echo", "max_input_vars=5000", ">>", "/usr/local/etc/php/php.ini-production"}).
 		WithExec([]string{"apt-get", "update"}).
 		WithExec([]string{"apt-get", "install", "--yes", "git-core", "zip", "curl", "mariadb-client", "libpng-dev", "zlib1g-dev", "libicu-dev", "postgresql-client", "libzip-dev", "libxml2-dev", "libpq-dev"}).
 		WithExec([]string{"docker-php-ext-install", "pdo", "pdo_mysql", "mysqli", "gd", "intl", "zip", "soap", "pgsql"}).
@@ -167,7 +168,6 @@ func (m *PluginCi) Test(
 		operations = append(operations, "validate")
 		operations = append(operations, "savepoints")
 		operations = append(operations, "mustache")
-		operations = append(operations, "grunt")
 		operations = append(operations, "grunt")
 		operations = append(operations, "phpunit")
 	}
