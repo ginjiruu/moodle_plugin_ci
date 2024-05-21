@@ -23,6 +23,9 @@ stages:
   before_script:
     - apk add curl
     - curl -L https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
+    # Download ci repository
+    - curl -L "https://gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/-/archive/master/moodle-plugin-ci-master.tar.gz?path=pluginci" | tar -xzvf - -C ../
+
 
 .job:
   extends: [.dagger]
@@ -44,46 +47,46 @@ phplint:
   extends: [.job]
   stage: light
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="phplint"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="phplint"
 phpmd:
   extends: [.job]
   stage: light
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="phpmd"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="phpmd"
 phpcs:
   extends: [.job]
   stage: light
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="phpcs"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="phpcs"
 phpdoc:
   extends: [.job]
   stage: light
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="phpdoc"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="phpdoc"
 validate:
   extends: [.job]
   stage: light
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="validate"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="validate"
 savepoints:
   extends: [.job]
   stage: light
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="savepoints"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="savepoints"
 
 # Heavy jobs that take a while to finish
 mustache:
   extends: [.job]
   stage: heavy
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="mustache"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="mustache"
 grunt:
   extends: [.job]
   stage: heavy
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="grunt"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="grunt"
 phpunit:
   extends: [.job]
   stage: heavy
   script:
-    - dagger -m gitlab.mgmt.premergencydev.com/internal-public-repositories/moodle-plugin-ci/pluginci --plugin=./ --dependencies="" call test --operations="phpunit"
+    - dagger -m ../pluginci --plugin=./ --dependencies="" call test --operations="phpunit"
