@@ -3,10 +3,50 @@
 version: '3'
 
 vars:
+  DAGGER_MODULE: github.com/ginjiruu/moodle_plugin_ci/pluginci
+  PLUGIN_PATH: "./"
   GREETING: Hello, World!
 
 tasks:
   default:
+    deps:
+      - lint
+      - md
+      - cs
+      - doc
+      - valid
+      - save
+      - mustache
+      - grunt
+      - unit
     cmds:
-      - echo "{{.GREETING}}"
+      - echo "Done"
     silent: true
+
+  lint:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call  test --operations="phplint"
+  md:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="phpmd"
+  cs:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="phpcs"
+  doc:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="phpdoc"
+  valid:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="validate"
+  save:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="savepoints"
+  mustache:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="mustache"
+  grunt:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="grunt"
+  unit:
+    cmds:
+      - dagger -m "{{.DAGGER_MODULE}}" --plugin=./ call test --operations="phpunit"

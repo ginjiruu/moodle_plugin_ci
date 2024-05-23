@@ -17,9 +17,14 @@ func New(
 	// +optional
 	// +default="8.1"
 	phpVersion string,
+	// Branch of moodle to run against
 	// +optional
 	// +default="MOODLE_401_STABLE"
 	moodleVersion string,
+	// Moodle repository to pull from
+	// +optional
+	// +default="git@github.com:moodle/moodle.git"
+	moodleRepo string,
 	// +optional
 	// +default="mariadb"
 	database string,
@@ -174,19 +179,5 @@ func (m *PluginCi) Test(
 	// +default=["phplint"]
 	operations []string,
 ) (string, error) {
-	// if slices.Contains(operations, "all") {
-	// 	operations[0] = "phplint"
-	// 	operations = append(operations, "phpmd")
-	// 	operations = append(operations, "phpcs")
-	// 	operations = append(operations, "phpdoc")
-	// 	operations = append(operations, "validate")
-	// 	operations = append(operations, "savepoints")
-	// 	operations = append(operations, "mustache")
-	// 	operations = append(operations, "grunt")
-	// 	operations = append(operations, "phpunit")
-	// }
-	// for _, operation := range operations {
 	return m.Moodle(ctx).WithExec([]string{"../ci/bin/moodle-plugin-ci", operations[0]}).Stdout(ctx)
-	// }
-	// return content, errs
 }
